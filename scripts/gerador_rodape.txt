@@ -1,0 +1,46 @@
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--json", required=True,
+                    help="JSON com itens no formato do DJEN, ou {items:[...]}")
+    ap.add_argument("--saida", default=".")
+    ap.add_argument("--advogado", default="")
+    ap.add_argument("--oab", default="")
+    ap.add_argument("--data", default=None, help="AAAA-MM-DD; padrao: hoje")
+    ap.add_argument("--coleta-incompleta", default=None,
+                    help="motivo da falha; faz o relatorio avisar em vermelho")
+    args = ap.parse_args()
+
+    bruto = json.loads(Path(args.json).read_text(encoding="utf-8-sig"))
+    itens = bruto.get("items", bruto) if isinstance(bruto, dict) else bruto
+    data = dt.date.fromisoformat(args.data) if args.data else dt.date.today()
+
+    resumo = {"completa": args.coleta_incompleta is None,
+              "erro": args.coleta_incompleta,
+              "periodo": {"inicio": str(data - dt.timedelta(days=1)),
+                          "fim": str(data)}}
+    registros = ordena_por_prioridade(classifica_lote(itens))
+    pasta = Path(args.saida)
+    pasta.mkdir(parents=True, exist_ok=True)
+    pdf = pasta / f"relatorio_prazos_{data.isoformat()}.pdf"
+    xlsx = pasta / f"controle_prazos_{data.isoformat()}.xlsx"
+    gera_pdf(registros, resumo, args.advogado, args.oab, str(pdf), data)
+    gera_xlsx(registros, resumo, args.advogado, args.oab, str(xlsx), data)
+
+    contagem = {}
+    for r in registros:
+        p = r["classificacao"]["prioridade"]
+        contagem[p] = contagem.get(p, 0) + 1
+    print(json.dumps({
+        "publicacoes": len(registros),
+        "por_prioridade": contagem,
+        "com_prazo_no_texto_sem_calculo": sum(
+            1 for r in registros if r["classificacao"]["dias"]
+            and r["classificacao"]["prazo_final"] is None),
+        "atos_distintos": len({r.get("link") for r in registros if r.get("link")}),
+        "pdf": str(pdf), "xlsx": str(xlsx)}, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()

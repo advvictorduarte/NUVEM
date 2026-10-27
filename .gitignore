@@ -1,0 +1,7 @@
+.env
+scripts/fase1/saida/
+__pycache__/
+*.pyc
+
+referencia/
+relatorios/

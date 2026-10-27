@@ -1,0 +1,51 @@
+{
+  "status": "success", "message": "ok", "count": 6,
+  "items": [
+    {"id": 0, "hash": "a1", "numeroprocessocommascara": "0100305-23.2023.5.01.0037",
+     "numero_processo": "01003052320235010037", "siglaTribunal": "TRT1",
+     "nomeOrgao": "37ª Vara do Trabalho do Rio de Janeiro",
+     "tipoComunicacao": "Intimação", "tipoDocumento": "Despacho",
+     "nomeClasse": "Ação Trabalhista - Rito Ordinário",
+     "data_disponibilizacao": "2026-10-23",
+     "destinatarios": [{"nome": "FULANO DE TAL (exemplo fictício)"}],
+     "texto": "Intimem-se as partes para que se manifestem em 5 dias sobre os cálculos apresentados."},
+
+    {"id": 1, "hash": "b2", "numeroprocessocommascara": "0814120-54.2026.8.19.0210",
+     "numero_processo": "08141205420268190210", "siglaTribunal": "TJRJ",
+     "nomeOrgao": "11º Juizado Especial Cível da Regional da Leopoldina",
+     "tipoComunicacao": "Intimação", "tipoDocumento": "Decisão",
+     "data_disponibilizacao": "2026-10-23",
+     "destinatarios": [{"nome": "BELTRANA DA SILVA (exemplo fictício)"}],
+     "texto": "Fica a parte autora intimada a apresentar contrarrazões em 15 dias, sob pena de preclusão."},
+
+    {"id": 2, "hash": "c3", "numeroprocessocommascara": "5133743-17.2021.4.02.5101",
+     "numero_processo": "51337431720214025101", "siglaTribunal": "TRF2",
+     "nomeOrgao": "31ª Vara Federal do Rio de Janeiro",
+     "tipoComunicacao": "Intimação", "tipoDocumento": "Sentença",
+     "data_disponibilizacao": "2026-10-23",
+     "destinatarios": [{"nome": "CICRANO SOUZA (exemplo fictício)"}],
+     "texto": "Manifeste-se a parte ré, em 30 dias, acerca do cumprimento de sentença."},
+
+    {"id": 3, "hash": "d4", "numeroprocessocommascara": "3002811-24.2026.8.19.0208",
+     "numero_processo": "30028112420268190208", "siglaTribunal": "TJRJ",
+     "nomeOrgao": "3ª Vara de Família da Regional do Méier",
+     "tipoComunicacao": "Intimação", "tipoDocumento": "",
+     "data_disponibilizacao": "2026-10-23", "destinatarios": [], "texto": ""},
+
+    {"id": 4, "hash": "e5", "numeroprocessocommascara": "0100795-86.2026.5.01.0248",
+     "numero_processo": "01007958620265010248", "siglaTribunal": "TRT1",
+     "nomeOrgao": "8ª Vara do Trabalho de Niterói",
+     "tipoComunicacao": "Ata de sessão", "tipoDocumento": "Ata",
+     "data_disponibilizacao": "2026-10-23",
+     "destinatarios": [{"nome": "EMPRESA EXEMPLO LTDA (fictícia)"}],
+     "texto": "Fica designada audiência de instrução para 03/12/2026, às 14h00, por videoconferência."},
+
+    {"id": 5, "hash": "f6", "numeroprocessocommascara": "0011511-02.2015.5.01.0071",
+     "numero_processo": "00115110220155010071", "siglaTribunal": "TRT1",
+     "nomeOrgao": "71ª Vara do Trabalho do Rio de Janeiro",
+     "tipoComunicacao": "Lista de distribuição", "tipoDocumento": "",
+     "data_disponibilizacao": "2026-10-23",
+     "destinatarios": [{"nome": "EXEMPLO EMPREITEIRA (fictícia)"}],
+     "texto": "Processo remetido ao arquivamento definitivo. Lista de distribuição publicada."}
+  ]
+}

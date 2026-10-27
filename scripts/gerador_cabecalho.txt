@@ -1,0 +1,30 @@
+"""Gerador do relatorio diario de prazos — arquivo unico.
+
+Montado a partir do pacote `coletor` para rodar sem instalacao: a tarefa
+agendada baixa este arquivo e executa. Nao altere aqui: altere no pacote
+e gere de novo com `python scripts/monta_gerador.py`.
+
+    python gerar_relatorio.py --json publicacoes.json --saida pasta \
+        --advogado "Nome" --oab "229618/RJ"
+
+Regras: docs/regras-classificacao.md, decididas em 27/10/2026.
+"""
+import argparse
+import datetime as dt
+import html
+import json
+import re
+import unicodedata
+from pathlib import Path
+
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.utils import get_column_letter
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_JUSTIFY
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.platypus import (KeepTogether, Paragraph, SimpleDocTemplate,
+                                Spacer, Table, TableStyle)
+
