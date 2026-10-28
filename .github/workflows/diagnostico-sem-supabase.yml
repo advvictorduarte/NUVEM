@@ -1,0 +1,37 @@
+name: Diagnostico sem Supabase
+on:
+  push:
+    branches: ["teste/sem-supabase-2026-10-28"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnostico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Testes offline
+        run: python3 -m unittest discover -s testes
+      - name: Acesso DJEN sem registrar publicacoes
+        run: |
+          python3 - <<'PY'
+          import datetime as dt
+          import json
+          from zoneinfo import ZoneInfo
+          from coletor.djen import _chama
+          hoje = dt.datetime.now(ZoneInfo("America/Sao_Paulo")).date()
+          parametros = {
+              "pagina": 1, "itensPorPagina": 1,
+              "numeroOab": "229618", "ufOab": "RJ",
+              "dataDisponibilizacaoInicio": str(hoje - dt.timedelta(days=1)),
+              "dataDisponibilizacaoFim": str(hoje),
+          }
+          corpo, segundos, erro = _chama(parametros, timeout=15, tentativas=1)
+          resultado = {"acesso": erro is None, "erro": erro,
+                       "itens_na_pagina": len(corpo.get("items") or []) if corpo else None,
+                       "total_informado": corpo.get("count") if corpo else None,
+                       "coleta_completa": False}
+          print(json.dumps(resultado, ensure_ascii=False))
+          raise SystemExit(1 if erro else 0)
+          PY
