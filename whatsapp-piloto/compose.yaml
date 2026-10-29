@@ -1,0 +1,94 @@
+name: whatsapp-piloto
+services:
+  postgres:
+    image: postgres:15.15-alpine@sha256:1d1095b0503145be79c79239372aefadfacf6b7c33c9245bbf99ce4b6b89c737
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: evolution
+      POSTGRES_DB: evolution
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Execute scripts/configurar.py}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U evolution -d evolution]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [privado]
+  redis:
+    image: redis:7.4.6-alpine@sha256:3b73847e72874be07e6657b129a94761662b79bc0f679273757d4218573b2a98
+    command: [redis-server, --appendonly, 'yes']
+    restart: unless-stopped
+    volumes: [redisdata:/data]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [privado]
+  evolution:
+    image: evoapicloud/evolution-api:v2.3.7@sha256:1bd8afc4a6cf48822e6cf02469aeae7bd35a12a6b616eacd1291926307f4d339
+    restart: unless-stopped
+    environment:
+      SERVER_TYPE: http
+      SERVER_PORT: '8080'
+      SERVER_URL: http://localhost:8080
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:?}
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://evolution:${POSTGRES_PASSWORD}@postgres:5432/evolution?schema=public
+      DATABASE_CONNECTION_CLIENT_NAME: whatsapp_piloto
+      DATABASE_SAVE_DATA_INSTANCE: 'true'
+      DATABASE_SAVE_DATA_NEW_MESSAGE: 'true'
+      DATABASE_SAVE_MESSAGE_UPDATE: 'true'
+      DATABASE_SAVE_DATA_CONTACTS: 'false'
+      DATABASE_SAVE_DATA_CHATS: 'true'
+      DATABASE_SAVE_DATA_HISTORIC: 'true'
+      CACHE_REDIS_ENABLED: 'true'
+      CACHE_REDIS_URI: redis://redis:6379/0
+      CACHE_LOCAL_ENABLED: 'false'
+      TELEMETRY_ENABLED: 'false'
+      SENTRY_DSN: ''
+      LOG_LEVEL: ERROR,WARN
+      LOG_BAILEYS: fatal
+      LOG_COLOR: 'false'
+      DEL_INSTANCE: 'false'
+      WEBHOOK_GLOBAL_ENABLED: 'false'
+      RABBITMQ_ENABLED: 'false'
+      S3_ENABLED: 'false'
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    ports: ['127.0.0.1:8080:8080']
+    volumes: [sessions:/evolution/instances, armazenados:/evolution/store]
+    networks: [privado]
+  relay:
+    build: .
+    restart: unless-stopped
+    environment:
+      GATEWAY_URL: ${GATEWAY_URL:?}
+      INGEST_TOKEN: ${INGEST_TOKEN:?}
+      LOCAL_WEBHOOK_TOKEN: ${LOCAL_WEBHOOK_TOKEN:?}
+      EVOLUTION_API_KEY: ${EVOLUTION_API_KEY:?}
+      EVOLUTION_URL: http://evolution:8080
+      ALLOWED_GROUPS: ${ALLOWED_GROUPS:-}
+      STATE_DIR: /data
+    volumes: [fila:/data]
+    depends_on: [evolution]
+    read_only: true
+    tmpfs: [/tmp:size=16m]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8090/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks: [privado]
+networks:
+  privado:
+    driver: bridge
+volumes:
+  pgdata:
+  redisdata:
+  sessions:
+  armazenados:
+  fila:
