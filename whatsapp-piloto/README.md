@@ -1,6 +1,6 @@
 # WhatsApp Business + GPT — piloto isolado
 
-Estado em 29/10/2026. Somente número secundário exclusivo de testes, sem conversas ou arquivos reais de clientes.
+Estado inicial em 29/10/2026; evolução local documentada em `docs/tempo-real.md`. O usuário posteriormente autorizou expressamente conexão da conta real e grupos específicos. Essa autorização não permite liberar automaticamente todos os grupos.
 
 ## Implantado e validado
 
@@ -11,7 +11,9 @@ Estado em 29/10/2026. Somente número secundário exclusivo de testes, sem conve
 - Busca textual em português com grupo, ID da mensagem, participante, data e evento de origem. Grupos desautorizados e mensagens excluídas ficam fora das consultas.
 - Validação remota com dados inventados: autenticação, restrição de instância e grupo, deduplicação, histórico simulado, uploads/downloads íntegros de anexos e negação de acesso público.
 
-**Não implantado/validado ainda:** VPS, Docker em execução, pareamento, captura real da Evolution/Baileys, recuperação real de histórico anterior, transcrição, OCR, extração de texto de PDF, geração de embeddings, busca semântica e conexão remota do ChatGPT. O MCP stdio e o OpenAPI são preparação; não significam que esta conversa já está conectada ao WhatsApp.
+**Atualização do piloto local:** Ubuntu 24.04 instalado em WSL 2 no Windows 10, com dados no disco D:, Docker/Compose executando e conta WhatsApp conectada após autorização expressa. Backfill real de um grupo entregou 337 mensagens e o download privado de anexos foi confirmado. A captura automática de novas mensagens ainda está em correção/validação; não está aprovada para produção.
+
+**Ainda pendentes:** VPS, garantia de completude de histórico, transcrição, OCR, extração de texto de PDF, geração de embeddings, busca semântica e conexão remota do ChatGPT. O MCP stdio e o OpenAPI são preparação; não significam que esta conversa já está conectada ao WhatsApp.
 
 ## Componentes
 
@@ -45,7 +47,7 @@ Firewall: liberar SSH apenas ao IP administrativo. Não liberar 8080, 8090, 5432
 ssh -N -L 8080:127.0.0.1:8080 USUARIO@IP_DA_VPS
 ```
 
-Abrir `http://localhost:8080/manager` pelo túnel. A chave local está em `.env`; não colar no chat ou em prints. As imagens têm tags fixas; pull, compatibilidade e execução das imagens ainda precisam ser verificados na VPS. Não foi executado `docker compose up` neste ambiente, que não dispõe de Docker.
+Abrir `http://localhost:8080/manager` pelo túnel. A chave local está em `.env`; não colar no chat ou em prints. As imagens têm tags fixas; pull, compatibilidade e execução das imagens ainda precisam ser verificados na VPS. Não foi executado `docker compose up` no ambiente do agente, que não dispõe de Docker. O usuário executou o Compose no Ubuntu/WSL do computador e confirmou os quatro serviços ativos.
 
 ## Pareamento e autorização do grupo fictício
 

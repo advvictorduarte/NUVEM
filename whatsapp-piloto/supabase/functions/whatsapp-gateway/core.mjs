@@ -12,7 +12,8 @@ export function unwrap(message) {
  return message || {};
 }
 export function normalize(payload) {
- const event=String(payload.event||'').replaceAll('_','.').toLowerCase();
+ let event=String(payload.event||'').replaceAll('_','.').toLowerCase();
+ if(event==='send.message')event='messages.upsert';
  const accepted=['messages.upsert','messages.set','messages.delete'];
  if (!accepted.includes(event)) return {event,received:0,records:[]};
  const source=Array.isArray(payload.data)?payload.data:(payload.data?.messages || [payload.data]);
@@ -66,7 +67,8 @@ export function createHandler({db,storage,authorize}) {
    }
    if(path==='/pending') {
     const allowed=await db.get('grupos','select=instancia,jid&autorizado=eq.true');
-    const rows=await db.get('mensagens',`select=id,instancia,grupo_jid,mensagem_id,mime_type&midia_status=eq.pendente&excluida=eq.false&midia_proxima=lte.${encodeURIComponent(new Date().toISOString())}&limit=20&order=recebido_em.asc`);
+    const limit=Number.isInteger(body.limit)?Math.min(20,Math.max(1,body.limit)):20;
+    const rows=await db.get('mensagens',`select=id,instancia,grupo_jid,mensagem_id,mime_type&midia_status=eq.pendente&excluida=eq.false&midia_proxima=lte.${encodeURIComponent(new Date().toISOString())}&limit=${limit}&order=recebido_em.desc`);
     return response(rows.filter(m=>allowed.some(g=>g.instancia===m.instancia&&g.jid===m.grupo_jid)));
    }
    if(path==='/media'||path==='/file'||path==='/message') {

@@ -26,6 +26,10 @@ test('marcação de exclusão e evento desconhecido',()=>{
  assert.equal(normalize({event:'qrcode.updated',data:{}}).records.length,0);
 });
 test('hash determinístico',async()=>assert.equal((await sha256('abc')).length,64));
+test('envio próprio SEND_MESSAGE também é ingerido',()=>{
+ const n=normalize({event:'SEND_MESSAGE',data:raw});
+ assert.equal(n.event,'messages.upsert');assert.equal(n.records[0].mensagem_id,'FICTICIO1');
+});
 test('nega requisição sem token',async()=>{
  const h=createHandler({authorize:async()=>false});
  assert.equal((await h(new Request('https://teste/whatsapp-gateway/search',{method:'POST',body:'{}'}))).status,401);
